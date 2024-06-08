@@ -6,16 +6,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProyectoSistemaTickets.Models;
+using MailKit.Net.Smtp;
+using MimeKit;
 
 namespace Systema_Tickets.Controllers
 {
     public class ticketsController : Controller
     {
         private readonly CompanyContext _context;
+        private readonly IConfiguration _configuration;
 
-        public ticketsController(CompanyContext context)
+        public ticketsController(CompanyContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         // GET: tickets
@@ -48,6 +52,26 @@ namespace Systema_Tickets.Controllers
             return View();
         }
 
+
+        // Método para enviar correo electrónico
+        private async Task EnviarCorreoAsync(string destinatario, string asunto, string mensaje)
+        {
+            var emailMessage = new MimeMessage();
+            emailMessage.From.Add(new MailboxAddress("HelpDesk", _configuration["Smtp:Username"]));
+            emailMessage.To.Add(new MailboxAddress("", destinatario));
+            emailMessage.Subject = asunto;
+            emailMessage.Body = new TextPart("plain") { Text = mensaje };
+
+            using (var client = new SmtpClient())
+            {
+                await client.ConnectAsync(_configuration["Smtp:Host"], int.Parse(_configuration["Smtp:Port"]), MailKit.Security.SecureSocketOptions.StartTls);
+                await client.AuthenticateAsync(_configuration["Smtp:Username"], _configuration["Smtp:Password"]);
+                await client.SendAsync(emailMessage);
+                await client.DisconnectAsync(true);
+            }
+        }
+
+
         // POST: tickets/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -57,9 +81,38 @@ namespace Systema_Tickets.Controllers
         {
             if (ModelState.IsValid)
             {
+
+                // Enviar correo electrónico al usuario que creó el ticket
+                var user = await _context.clientes.FindAsync(ticket.idcuenta);
+                if (user != null && !string.IsNullOrEmpty(user.correo))
+                {
+                    string asunto = ticket.nombre;
+                    string mensaje = $"Se ha creado un nuevo ticket con los siguientes detalles:\n\n" +
+                                     $"Título: {ticket.nombre}\n" +
+                                     $"Descripción: {ticket.descripcion}\n\n" +
+                                     "Pronto será contactado por un soporte.";
+                    await EnviarCorreoAsync(user.correo, asunto, mensaje);
+                }
+
+
+                // Enviar correo electrónico al admin o soporte
+                string adminEmail = "naty76181@gmail.com";
+                string asuntoAdmin = $"Nuevo ticket asignado: {ticket.nombre}";
+                string mensajeAdmin = $"Se ha creado un nuevo ticket con los siguientes detalles:\n\n" +
+                                      $"Título: {ticket.nombre}\n" +
+                                      $"Descripción: {ticket.descripcion}\n" +
+                                      $"Asignado a: Administrador\n\n" +
+                                      $"El ticket fue creado por: {user?.nombre}.";
+                await EnviarCorreoAsync(adminEmail, asuntoAdmin, mensajeAdmin);
+
+
                 _context.Add(ticket);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
+
+
+
+
             }
             return View(ticket);
         }

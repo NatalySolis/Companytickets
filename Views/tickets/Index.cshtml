@@ -1,0 +1,133 @@
+﻿@model IEnumerable<ProyectoSistemaTickets.Models.ticket>
+
+@{
+    ViewData["Title"] = "Bienvenido";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Systema_Tickets</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .card {
+            border-radius: 10px;
+            transition: transform 0.2s;
+        }
+
+            .card:hover {
+                transform: scale(1.05);
+            }
+
+        .card-title {
+            font-weight: bold;
+        }
+
+        .card-text {
+            font-size: 0.9em;
+        }
+
+        .btn-dark, .btn-outline-secondary {
+            color: #fff;
+            border-color: #343a40;
+        }
+
+            .btn-dark:hover, .btn-outline-secondary:hover {
+                background-color: #343a40;
+                color: #fff;
+            }
+
+        .btn-outline-secondary {
+            color: #6c757d;
+        }
+
+            .btn-outline-secondary:hover {
+                background-color: #6c757d;
+                color: #fff;
+            }
+
+        .list-group-item {
+            border: none;
+        }
+
+            .list-group-item.bg-light {
+                background-color: #f8f9fa !important;
+            }
+
+        /* Estilos adicionales */
+        .btn-create {
+            background-color: #ffe6cc;
+            border-color: #ffe6cc;
+            color: #343a40;
+            margin-bottom: 20px; /* Añadir espacio entre el botón y las tarjetas */
+        }
+
+            .btn-create:hover {
+                background-color: #ffd699;
+                border-color: #ffd699;
+                color: #343a40;
+            }
+
+        /* Estilos para alinear el título a la izquierda */
+        .title-container {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 20px; /* Añadir espacio entre el título y el botón */
+        }
+
+        /* Estilos para centrar el botón */
+        .button-container {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <main role="main" class="pb-3">
+            <div class="title-container">
+                <h1 class="text-left">Bienvenido</h1>
+            </div>
+
+            <div class="button-container">
+                <a class="btn btn-create btn-lg" asp-action="Create">Crear Nuevo Ticket</a>
+            </div>
+
+            <div class="row mt-5">
+                <!-- Añadir espacio entre el botón y las tarjetas -->
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title text-uppercase">@Html.DisplayFor(modelItem => item.nombre)</h5>
+                                <p class="card-text">@Html.DisplayFor(modelItem => item.descripcion)</p>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item bg-light"><strong>Cuenta:</strong> @Html.DisplayFor(modelItem => item.idcuenta)</li>
+                                    <li class="list-group-item bg-light"><strong>Prioridad:</strong> @Html.DisplayFor(modelItem => item.idpriori)</li>
+                                    <li class="list-group-item bg-light"><strong>Servicio:</strong> @Html.DisplayFor(modelItem => item.idservicio)</li>
+                                    <li class="list-group-item bg-light"><strong>Fecha de Creación:</strong> @item.fecha_crear.ToString("dd/MM/yyyy")</li>
+                                </ul>
+                                <div class="mt-3">
+                                    <a class="btn btn-outline-secondary btn-sm" asp-action="Edit" asp-route-id="@item.idticket">Edit</a>
+                                    <a class="btn btn-outline-secondary btn-sm" asp-action="Details" asp-route-id="@item.idticket">Details</a>
+                                    <a class="btn btn-outline-secondary btn-sm" asp-action="Delete" asp-route-id="@item.idticket">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

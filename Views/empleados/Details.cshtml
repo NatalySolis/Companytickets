@@ -1,0 +1,42 @@
+﻿@model ProyectoSistemaTickets.Models.empleados
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>empleados</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.nombre)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.nombre)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.tel)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.tel)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.idrol)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.idrol)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.idcuenta)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.idcuenta)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.idempleado">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
